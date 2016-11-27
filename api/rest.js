@@ -1,28 +1,58 @@
 var mysql = require("mysql");
 
-function REST_ROUTER(router,user,md5) {
+function REST_ROUTER(router,context,md5) {
     var self = this;
-    self.handleRoutes(router,user,md5);
+    self.handleRoutes(router,context,md5);
 }
 
-REST_ROUTER.prototype.handleRoutes= function(router,userRepo,md5) {
+REST_ROUTER.prototype.handleRoutes= function(router,context,md5) {
   router.get("/users/:user_id",function(req,res){
-      userRepo.findById(req.params.user_id)
+      context.users.findById(req.params.user_id)
         .then(function (user) {
           res.json({"Error" : false, "Message" : "Success", "User" : user});
         })
         .catch(function (err){
-          res.status(404).json({"Error" : true, "Message" : "Error record not found"});
+          res.status(404).json({"Error" : true, "Message" : "Error user not found"});
+        });
+  });
+
+  router.get("/users/:user_id/profiles",function(req,res){
+      context.users.findById(req.params.user_id)
+        .then(function (user) {
+          user.getProfiles()
+            .then(function(profiles){
+              res.json({"Error" : false, "Message" : "Success", "Profiles" : profiles});
+            })
+            .catch(function(error){
+              res.status(404).json({"Error" : true, "Message" : "Error profiles not found"});
+            });
+        })
+        .catch(function (err){
+          res.status(404).json({"Error" : true, "Message" : "Error user not found"});
+        });
+  });
+
+  router.get("/profiles/",function(req,res){
+      context.profiles.findAll({
+          where: {
+            userId: req.query.userId
+          }
+        })
+        .then(function (profiles) {
+          res.json({"Error" : false, "Message" : "Success", "Profiles" : profiles});
+        })
+        .catch(function(error){
+          res.status(404).json({"Error" : true, "Message" : "Error profiles not found"});
         });
   });
 
   router.get("/users",function(req,res){
-      userRepo.findAll()
+      context.users.findAll()
         .then(function (users) {
           res.json({"Error" : false, "Message" : "Success", "Users" : users});
         })
         .catch(function (err){
-          res.status(500).json({"Error" : true, "Message" : "Error retrieving records"});
+          res.status(500).json({"Error" : true, "Message" : "Error retrieving users"});
         });
   });
 
@@ -33,13 +63,13 @@ REST_ROUTER.prototype.handleRoutes= function(router,userRepo,md5) {
         res.status(400).json({"Error" : false, "Message" : "request not valid"});
         return;
       }
-      var user = userRepo.build({username: userDto.username});
+      var user = context.users.build({username: userDto.username});
       user.save()
         .then(function(){
           res.json({"Error" : false, "Message" : `/users/${user.id}`, "User": user});
         })
         .catch(function(error) {
-          res.status(500).json({"Error" : true, "Message" : "Error saving User"});
+          res.status(500).json({"Error" : true, "Message" : "Error saving user"});
         })
     });
 
@@ -50,7 +80,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,userRepo,md5) {
           res.status(400).json({"Error" : false, "Message" : "request not valid"});
           return;
         }
-        userRepo.findById(userDto.id)
+        context.users.findById(userDto.id)
           .then(function (user) {
             user.update({
                 username: userDto.username
@@ -59,29 +89,29 @@ REST_ROUTER.prototype.handleRoutes= function(router,userRepo,md5) {
                 res.json({"Error" : false, "Message" : "Success", "User" : user});
               })
               .catch(function(error){
-                res.status(500).json({"Error" : false, "Message" : "Error updating the record"});
+                res.status(500).json({"Error" : false, "Message" : "Error updating the user"});
               })
           })
           .catch(function (err){
             console.log(err);
-            res.status(404).json({"Error" : true, "Message" : "Error record not found"});
+            res.status(404).json({"Error" : true, "Message" : "Error user not found"});
           });
       });
 
       router.delete("/users/:user_id",function(req,res){
-          userRepo.findById(req.params.user_id)
+          context.users.findById(req.params.user_id)
             .then(function (user) {
               user.destroy()
                 .then(function(){
                   res.json({"Error" : false, "Message" : "Success"});
                 })
                 .catch(function(error){
-                  res.status(500).json({"Error" : false, "Message" : "Error deleting the record"});
+                  res.status(500).json({"Error" : false, "Message" : "Error deleting the user"});
                 })
             })
             .catch(function (err){
               console.log(err);
-              res.status(404).json({"Error" : true, "Message" : "Error record not found"});
+              res.status(404).json({"Error" : true, "Message" : "Error user not found"});
             });
         });
 }

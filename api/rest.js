@@ -73,6 +73,23 @@ REST_ROUTER.prototype.handleRoutes= function(router,context,md5) {
         })
     });
 
+    router.post("/profiles",function(req,res){
+        var profileDto = req.body;
+        if(!profileDto.name || !profileDto.userId)
+        {
+          res.status(400).json({"Error" : false, "Message" : "request not valid"});
+          return;
+        }
+        var profile = context.profiles.build({name: profileDto.name, userId: profileDto.userId});
+        profile.save()
+          .then(function(){
+            res.json({"Error" : false, "Message" : `/profiles/${profile.id}`, "Profile": profile});
+          })
+          .catch(function(error) {
+            res.status(500).json({"Error" : true, "Message" : "Error saving profile"});
+          })
+      });
+
     router.put("/users",function(req,res){
         var userDto = req.body;
         if(!userDto.username || !userDto.id)

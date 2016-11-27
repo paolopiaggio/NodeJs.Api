@@ -32,7 +32,7 @@ REST.prototype.connectMysql = function() {
         }
     });
 
-    var User = sequelize.define('users', {
+    var User = sequelize.define('user', {
       id: {
           type: Sequelize.INTEGER,
           autoIncrement: true,
@@ -46,8 +46,10 @@ REST.prototype.connectMysql = function() {
               len: 2
           }
       }
+    },{
+      tableName: 'user'
     });
-    var Profile = sequelize.define('profiles', {
+    var Profile = sequelize.define('profile', {
       id: {
           type: Sequelize.INTEGER,
           autoIncrement: true,
@@ -66,6 +68,8 @@ REST.prototype.connectMysql = function() {
           references: { model: "users", key: "id" },
           field: 'user_id'
         }
+    },{
+      tableName: 'profile'
     });
 
     User.hasMany(Profile);

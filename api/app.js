@@ -21,14 +21,26 @@ REST.prototype.connectMysql = function() {
           min: 0,
           idle: 10000
         },
-        logging: null,//console.log,
+        logging: console.log,
         define: {
             timestamps: false
         }
     });
 
     var User = sequelize.define('users', {
-        username: Sequelize.STRING,
+      id: {
+          type: Sequelize.INTEGER,
+          autoIncrement: true,
+          primaryKey: true
+      },
+      username: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          unique: true,
+          validate: {
+              len: 2
+          }
+      }
     });
 
     sequelize

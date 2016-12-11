@@ -1,4 +1,5 @@
 var mysql = require("mysql");
+var simpleService = require('./services/simpleService.js');
 
 function REST_ROUTER(router,context,md5) {
     var self = this;
@@ -6,6 +7,10 @@ function REST_ROUTER(router,context,md5) {
 }
 
 REST_ROUTER.prototype.handleRoutes= function(router,context,md5) {
+  router.get("/test/",function(req,res){
+      res.json({"Error" : false, "Message" : "Success", "myName" : simpleService.getMyName()});
+  });
+
   router.get("/users/:user_id",function(req,res){
       context.users.findById(req.params.user_id)
         .then(function (user) {

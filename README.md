@@ -1,5 +1,11 @@
 # Sample NodeJs Api
 
+## dependencies:
+```javascript
+// spins up DB machine
+vagrant up
+```
+
 ## commands:
 ```javascript
 // install dependencies

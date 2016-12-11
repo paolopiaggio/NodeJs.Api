@@ -20,7 +20,7 @@ REST.prototype.connectMysql = function() {
     var self = this;
     var sequelize = new Sequelize('nodejsApiDB', 'local', 'local', {
         host: '192.168.50.10',
-        dialect: 'mysql',
+        dialect: 'sqlite',
         pool: {
           max: 5,
           min: 0,
@@ -29,7 +29,8 @@ REST.prototype.connectMysql = function() {
         logging: console.log,
         define: {
             timestamps: false
-        }
+        },
+        storage: '../sqlite.db'
     });
 
     var User = sequelize.define('user', {
